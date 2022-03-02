@@ -1,0 +1,32 @@
+const express = require("express");
+const router = express.Router();
+const createError = require("http-errors");
+const todos = [{ id: 1, name: "Do something", completed: false }];
+
+/* GET todos listing. */
+router.get("/", function (req, res, next) {
+  return res.json(todos);
+});
+
+router.get("/:id", function (req, res, next) {
+  const foundTodo = todos.find((todo) => todo.id === Number(req.params.id));
+  console.log(foundTodo);
+  if (!foundTodo) return next(createError(404, "Not Found"));
+  return res.json(foundTodo);
+});
+
+router.post("/", function (req, res, next) {
+  const { body } = req;
+  if (typeof body.name !== "string")
+    return next(createError(422, "Validation Error"));
+
+  const newTodo = {
+    id: todos.length + 1,
+    name: body.name,
+    completed: false,
+  };
+  todos.push(newTodo);
+
+  return res.status(201).json(newTodo);
+});
+module.exports = router;
